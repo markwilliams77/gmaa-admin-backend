@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  username   String   @unique
+  password   String
+  status     String   @default("active")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Vendor {
+  id         String   @id @default(cuid())
+  name       String
+  email      String   @unique
+  location   String?
+  specialty  String?
+  status     String   @default("active")
+  bids       Bid[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Tender {
+  id              String   @id @default(cuid())
+  service         String
+  category        String
+  region          String
+  budget          String
+  deadline        String
+  description     String
+  requirements    String[] @default([])
+  status          String   @default("open")
+  awardedBidId    String?
+  awardedVendorId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  bids            Bid[]
+}
+
+model Bid {
+  id         String   @id @default(cuid())
+  tender     Tender   @relation(fields: [tenderId], references: [id])
+  tenderId   String
+  vendor     Vendor?  @relation(fields: [vendorId], references: [id])
+  vendorId   String?
+  vendorName String
+  amount     String
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model SupportTicket {
+  id          String                  @id @default(cuid())
+  subject     String
+  status      String   @default("pending")
+  lastUpdated DateTime @default(now())
+  lastMessage String
+  messages    SupportTicketMessage[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SupportTicketMessage {
+  id          String        @id @default(cuid())
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id])
+  ticketId    String
+  text        String
+  sender      String
+  senderName  String
+  createdAt   DateTime @default(now())
+}
+
+model Consultation {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  phone      String
+  request    String
+  status     String   @default("processing")
+  remarks    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Lead {
+  id         String        @id @default(cuid())
+  name       String
+  email      String
+  phone      String
+  status     String   @default("open")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  messages   LeadMessage[]
+}
+
+model LeadMessage {
+  id         String  @id @default(cuid())
+  lead       Lead    @relation(fields: [leadId], references: [id])
+  leadId     String
+  text       String
+  sender     String
+  senderName String
+  createdAt  DateTime @default(now())
+}
