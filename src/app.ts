@@ -23,6 +23,22 @@ app.use(
   })
 );
 app.use(express.json());
+
+app.get("/", (_req, res) => {
+  res.json({
+    success: true,
+    service: "GMAA Admin Backend API",
+    health: "/api/health",
+  });
+});
+
+app.get("/api/health", (_req, res) => {
+  res.json({
+    success: true,
+    status: "ok",
+  });
+});
+
 app.use("/api", apiRouter);
 app.use(errorHandler);
 
